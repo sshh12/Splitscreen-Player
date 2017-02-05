@@ -9,7 +9,11 @@ An HTML/JS based Media Player with the abilty to shows 6 different videos synced
 * [Bootstrap](http://getbootstrap.com/)
 * [Bootstrap3-dialog](https://github.com/nakupanda/bootstrap3-dialog)
 
-### Realtime Database Setup
+---
+
+##Setup
+
+#### Realtime Database
 ```
 videoplayer
 |
@@ -32,7 +36,7 @@ videoplayer
        |- 5: 0.0
 ```
 
-### Storage Setup
+#### Storage
 ```
 videos/
 	video0.mp4
