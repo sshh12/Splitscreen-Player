@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+
+    <title>Video Player</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/flatly/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.7/css/bootstrap-dialog.min.css" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Splitscreen Viewer</h1>
+            <p class="lead">A Multi-Synchronous Video Player</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 video"><video id="vid0" width="100%"><source src="" type="video/mp4" preload="auto"></video></div>
+            <div class="col-md-4 video"><video id="vid1" width="100%"><source src="" type="video/mp4" preload="auto"></div>
+			<div class="col-md-4 video"><video id="vid2" width="100%"><source src="" type="video/mp4" preload="auto"></video></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 video"><video id="vid3" width="100%"><source src="" type="video/mp4" preload="auto"></video></div>
+            <div class="col-md-4 video"><video id="vid4" width="100%"><source src="" type="video/mp4" preload="auto"></div>
+	        <div class="col-md-4 video"><video id="vid5" width="100%"><source src="" type="video/mp4" preload="auto"></video></div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">Controls</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-success" onClick="send({'action':'play'})">Play</button>
+                            <button type="button" class="btn btn-primary" onClick="send({'action':'pause'})">Pause</button>
+                            <button type="button" class="btn btn-warning" onClick="send({'action':'set', 'time':getCurrentTime()})">ReSync</button>
+                            <button type="button" class="btn btn-danger" onClick="send({'action':'reset'})">Reset</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-info" onClick="send({'action':'set', 'time':getCurrentTime() - 60})">-1m</button>
+                            <button type="button" class="btn btn-info" onClick="send({'action':'set', 'time':getCurrentTime() - 30})">-30s</button>
+                            <button type="button" class="btn btn-info" onClick="send({'action':'set', 'time':getCurrentTime() - 10})">-10s</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-info" onClick="send({'action':'set', 'time':getCurrentTime() + 60})">+1m</button>
+                            <button type="button" class="btn btn-info" onClick="send({'action':'set', 'time':getCurrentTime() + 30})">+30s</button>
+                            <button type="button" class="btn btn-info" onClick="send({'action':'set', 'time':getCurrentTime() + 10})">+10s</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-info" onClick="send({'action':'speed', 'rate':getCurrentSpeed() * 2})">x2</button>
+                            <button type="button" class="btn btn-info" onClick="send({'action':'speed', 'rate':getCurrentSpeed() * 0.5})">x0.5</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">Video</div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-info" id="uploadbtn" onClick="upload()">Upload</button>
+                            <button type="button" class="btn btn-warning" onClick="loadVideos()">Reload All</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-info" id="rotateprimary" onClick="rotatePrimary()">Change Primary Video</button>
+                            <button type="button" class="btn btn-primary" id="primary">0</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-danger" onClick="resetOffsets()">Reset Offsets</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning" onClick="modifyOffset(offsets[primaryID] - 10)">P-10</button>
+                            <button type="button" class="btn btn-warning" onClick="modifyOffset(offsets[primaryID] + .1)">P+.1</button>
+                            <button type="button" class="btn btn-warning" onClick="modifyOffset(offsets[primaryID] + 1)">P+1</button>
+                            <button type="button" class="btn btn-warning" onClick="modifyOffset(offsets[primaryID] + 10)">P+10</button>
+                            <button type="button" class="btn btn-warning" onClick="modifyOffset(offsets[primaryID] + 30)">P+30</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.7/js/bootstrap-dialog.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase.js"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <style>
+        .container {
+            width: 90%
+        }
+        
+        .btn-toolbar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .panel {
+            text-align: center;
+        }
+    </style>
+</body>
+
+</html>
