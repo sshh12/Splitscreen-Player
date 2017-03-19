@@ -11,7 +11,7 @@ An HTML/JS based Media Player with the abilty to shows 6 different videos synced
 
 ---
 
-##Setup
+## Setup
 
 #### Realtime Database
 ```
