@@ -20,9 +20,8 @@ BootstrapDialog.show({
 });
 
 //For global access
-var primaryID = 0;
-var storage;
-var db;
+var primaryID = 0,
+    storage, db;
 
 //Video Methods
 var offsets = [0, 0, 0, 0, 0, 0];
@@ -94,15 +93,16 @@ function init(email, pass) {
     doToAll(function(v, id) {
         var offsetRef = db.ref('offsets/' + id);
         offsetRef.on('value', function(content) {
-            console.log('Updating Offset for ' + id);
             offsets[id] = content.val();
             v.currentTime = offsets[id];
+            console.log('OFFSET ' + id + ' = ' + offsets[id]);
         });
     })
 
     var ignore = true; //Ignore the first result to avoid auto pausing
     var cmdRef = db.ref('command');
     cmdRef.on('value', function(v) {
+
         if (!ignore) {
 
             var content = v.val();
@@ -134,11 +134,11 @@ function init(email, pass) {
         } else {
             ignore = false;
         }
+
     });
 
     //Load Videos
     storage = firebase.storage();
-
     loadVideos();
 
 }
@@ -150,8 +150,10 @@ function upload() {
         title: 'Upload',
         message: 'ID (0-5): <input type="number" id="num" max=5 min=0 class="form-control"><br>File: <input type="file" id="file" class="form-control">',
         onhide: function(dialogRef) {
-            id = dialogRef.getModalBody().find('#num').val();
-            vidFile = dialogRef.getModalBody().find('#file').get(0).files[0];
+
+            var id = dialogRef.getModalBody().find('#num').val();
+            var vidFile = dialogRef.getModalBody().find('#file').get(0).files[0];
+
             if (dialogRef.getModalBody().find('#file').val().length > 5) {
 
                 document.getElementById('uploadbtn').innerHTML = 'Uploading...';
@@ -159,10 +161,24 @@ function upload() {
                 document.getElementById('uploadbtn').className = 'btn btn-success';
 
                 var videoRef = storage.refFromURL('gs://videoplayer-9311f.appspot.com/videos/video' + id + '.mp4');
-                videoRef.put(vidFile).then(function(snapshot) {
+                var uploadTask = videoRef.put(vidFile)
+
+                uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, function(snapshot) { // Loading...
+
+                    var percent = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+                    document.getElementById('uploadbtn').innerHTML = 'Uploading...' + percent.toFixed(2) + '%';
+
+                }, function(error) { // Error!
+
+                    console.log(error);
+
+                }, function() { // Done.
+
                     document.getElementById('uploadbtn').innerHTML = 'Upload';
                     document.getElementById('uploadbtn').onClick = 'upload()';
                     document.getElementById('uploadbtn').className = 'btn btn-info';
+                    loadVideos();
+
                 });
 
             }
@@ -182,8 +198,7 @@ function loadVideos() {
     doToAll(function(v, id) {
         var videoRef = storage.refFromURL('gs://videoplayer-9311f.appspot.com/videos/video' + id + '.mp4');
         videoRef.getDownloadURL().then(function(url) {
-            console.log(id);
-            console.log(url);
+            console.log("GOT " + id + " @ " + url);
             v.src = url;
             v.currentTime = offsets[id];
             v.controls = false;

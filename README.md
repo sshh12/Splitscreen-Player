@@ -1,6 +1,6 @@
 # Splitscreen Viewer
 
-An HTML/JS based Media Player with the abilty to shows 6 different videos synced across multiple devices.
+An HTML/JS based Media Player with the abilty to show 6 different videos synced across multiple devices.
 
 [Live Code](https://videoplayer-9311f.firebaseapp.com/)
 
